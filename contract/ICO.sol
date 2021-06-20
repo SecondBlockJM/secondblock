@@ -77,11 +77,11 @@ contract SecondBlock is IERC20 {
     string private _symbol;
     string private _tokenname;
     uint8 private _decimals;
-    uint public _icoRate = 100; //  BSC : SBT = 100 : 1
-    uint public _feeRate = 1;   //  Burn 1%
-    address public _admin;
+    uint private _icoRate = 100; //  BSC : SBT = 100 : 1
+    uint private _feeRate = 1;   //  Burn 1%
+    address private _admin;
     address payable _this;
-    bool public _start; 
+    bool private _start; 
 
     event Burn(address _addr,address _blackhole,uint256 _amount);
     event Buy(address _addr,uint256 _amount);
