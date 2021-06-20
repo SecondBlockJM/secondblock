@@ -65,7 +65,7 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract ICO is IERC20 {
+contract SecondBlock is IERC20 {
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -78,7 +78,7 @@ contract ICO is IERC20 {
     string private _tokenname;
     uint8 private _decimals;
     uint public _icoRate = 100; //  BSC : SBT = 100 : 1
-    uint public _feeRate = 1;   //  1%
+    uint public _feeRate = 1;   //  Burn 1%
     address public _admin;
     address payable _this;
     bool public _start; 
@@ -91,50 +91,45 @@ contract ICO is IERC20 {
         _totalSupply = 1000*1e8*1e18;
         _decimals = 18;
         _balances[address(this)] = _totalSupply / 10;                              // ICO
-        _balances[0x25a2191359f28d9AD0baB6982B5b76d1b7247eef] = _totalSupply / 10; // Private Sell
-        _balances[0x8e304c911CaDDD673F5842Cd6d42f305bc7e5E0C] = _totalSupply / 10; // IOD Airdrop
-        _balances[0x352f8699CE4215F685439F17074660e497849E1B] = _totalSupply / 10; // Game Mining
-        _balances[0x2c79b2289B3deB2937B075d05B507F9D53FAFECc] = _totalSupply / 5; // Team Income
+        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // Private Sell
+        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // IOD Airdrop
+        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // Game Mining
+        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 5; // Team Income
 
-
-        _start = false;  // 开盘不收手续费
+        _start = false;  // No Burn at the beginning
         _admin = msg.sender;
-        emit Transfer(address(0), 0x25a2191359f28d9AD0baB6982B5b76d1b7247eef, _totalSupply / 10 );
-        emit Transfer(address(0), 0x8e304c911CaDDD673F5842Cd6d42f305bc7e5E0C, _totalSupply / 10 );
-        emit Transfer(address(0), 0x352f8699CE4215F685439F17074660e497849E1B, _totalSupply / 10 );
-        emit Transfer(address(0), 0x2c79b2289B3deB2937B075d05B507F9D53FAFECc, _totalSupply / 5  );
+        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
+        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
+        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
+        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 5  );
     }
 
     modifier onlyOwner() {
-        require(_admin == msg.sender, "Ownable: caller is not the owner");
+        require(_admin == msg.sender, "Ownable: You are not the owner");
         _;
     }
 
     function withdrawICO() public onlyOwner {
             _this = msg.sender;
             uint256 _amount = address(this).balance;
-            _this.transfer(_amount);      
+            _this.transfer(_amount);
     }
 
     function name() public view returns (string memory) {
         return _tokenname;
     }
 
-
     function symbol() public view returns (string memory) {
         return _symbol;
     }
 
- 
     function decimals() public view returns (uint8) {
         return _decimals;
     }
 
- 
     function totalSupply() public view override returns (uint256) {
         return _totalSupply;
     }
-
 
     function balanceOf(address account) public view override returns (uint256) {
         return _balances[account];
@@ -143,9 +138,9 @@ contract ICO is IERC20 {
     function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
         require(!_blacklist[msg.sender],"ERC20 : You're locked out");
         if (_start) {
-            uint256 _amount = amount.mul(100 - _feeRate).div(100);
+            uint256 _amount = amount.mul(uint256(100).sub(_feeRate)).div(100);  
             uint256 _fee = amount.sub(_amount);
-            _transfer(_msgSender(), _admin, _fee);   // 按比例发送给烧毁
+            _transfer(_msgSender(), _admin, _fee);   // Burn fee
             _transfer(_msgSender(), recipient, _amount);
             emit burn(_msgSender(),_amount);
             return true;
@@ -154,14 +149,12 @@ contract ICO is IERC20 {
         return true;
     }
 
-    function setBlackList(address _addr) external onlyOwner {
-        _blacklist[_addr] = true;
+    function setBlackList(address _addr,bool locked) external onlyOwner {
+        _blacklist[_addr] = locked;
     }
     
     function initBlackList()external onlyOwner {
-         //_blacklist[0x8e304c911CaDDD673F5842Cd6d42f305bc7e5E0C] = true; // IOD Airdrop
-         //_blacklist[0x352f8699CE4215F685439F17074660e497849E1B] = true; // Game Mining
-         _blacklist[0x2c79b2289B3deB2937B075d05B507F9D53FAFECc] = true; // Team Income
+         _blacklist[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = true; // Team Income
     }
 
     function setICORate(uint256 _num) external onlyOwner {
@@ -180,22 +173,21 @@ contract ICO is IERC20 {
         return _allowances[owner][spender];
     }
 
-
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
-        require(!_blacklist[msg.sender],"ERC20 : You're locked out");
+        require(!_blacklist[msg.sender],"ERC20 : locked");
 
         if (_start) {
             uint256 _amount = amount.mul(100 - _feeRate).div(100);
             uint256 _fee = amount.sub(_amount);
-            _transfer(_msgSender(), _admin, _fee);   // 按比例发送给烧毁
+            _transfer(_msgSender(), address(this), _fee);   // Burn fee
             _transfer(_msgSender(), recipient, _amount);
             _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
-            emit burn(_msgSender(),_amount);
+            emit burn(_msgSender(),_fee);
             return true;
         }
 
@@ -203,7 +195,6 @@ contract ICO is IERC20 {
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
     }
-
 
     function _transfer(address sender, address recipient, uint256 amount) internal virtual {
         require(sender != address(0), "ERC20: transfer from the zero address");
@@ -213,7 +204,6 @@ contract ICO is IERC20 {
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
-
 
     function _approve(address owner, address spender, uint256 amount) internal virtual {
         require(owner != address(0), "ERC20: approve from the zero address");
@@ -226,11 +216,11 @@ contract ICO is IERC20 {
     function _msgSender() internal view virtual returns (address payable) {
         return msg.sender;
     }
-        
+
     receive () external payable {
         uint256 _amount = msg.value;
         _transfer(address(this),msg.sender,_amount*_icoRate);
         emit buy(msg.sender,_amount*_icoRate);
     }
-    
+
 }
