@@ -137,7 +137,7 @@ contract SecondBlock is IERC20 {
     }
 
     function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
-        require(!_blacklist[msg.sender],"ERC20 : You're locked out");
+        require(!_blacklist[msg.sender],"ERC20 : You are locked out");
         if (_start) {
             uint256 _amount = amount.mul(uint256(100).sub(_feeRate)).div(100);  
             uint256 _fee = amount.sub(_amount);
@@ -175,7 +175,7 @@ contract SecondBlock is IERC20 {
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
-        require(!_blacklist[msg.sender],"ERC20 : locked");
+        require(!_blacklist[msg.sender],"ERC20 : You are locked out");
 
         if (_start) {
             uint256 _amount = amount.mul(100 - _feeRate).div(100);
