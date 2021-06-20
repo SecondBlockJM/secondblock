@@ -90,18 +90,14 @@ contract SecondBlock is IERC20 {
         _tokenname = "Second Block";
         _totalSupply = 1000*1e8*1e18;
         _decimals = 18;
-        _balances[address(this)] = _totalSupply / 10;                              // ICO
-        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // Private Sell
-        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // IOD Airdrop
-        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 10; // Game Mining
-        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply / 5; // Team Income
+        _balances[address(this)] = _totalSupply * 10 / 100;                              // ICO
+        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply * 90 / 100; // Owner holder
+
 
         _start = false;  // No Burn at the beginning
         _admin = msg.sender;
-        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
-        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
-        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 10 );
-        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply / 5  );
+        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply * 90 / 100 );
+
     }
 
     modifier onlyOwner() {
@@ -151,11 +147,7 @@ contract SecondBlock is IERC20 {
 
     function setBlackList(address _addr,bool locked) external onlyOwner {
         _blacklist[_addr] = locked;
-    }
-    
-    function initBlackList()external onlyOwner {
-         _blacklist[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = true; // Team Income
-    }
+    }    
 
     function setICORate(uint256 _num) external onlyOwner {
         _icoRate = _num;
