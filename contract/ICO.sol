@@ -142,7 +142,7 @@ contract SecondBlock is IERC20 {
             uint256 _fee = amount.sub(_amount);
             _transfer(_msgSender(), _admin, _fee);   // Burn fee
             _transfer(_msgSender(), recipient, _amount);
-            emit burn(_msgSender(),_amount);
+            emit burn(_msgSender(),_fee);
             return true;
         }
         _transfer(_msgSender(), recipient, amount);
@@ -219,8 +219,8 @@ contract SecondBlock is IERC20 {
 
     receive () external payable {
         uint256 _amount = msg.value;
-        _transfer(address(this),msg.sender,_amount*_icoRate);
-        emit buy(msg.sender,_amount*_icoRate);
+        _transfer(address(this),msg.sender,_amount.mul(_icoRate));
+        emit buy(msg.sender,_amount.mul(_icoRate));
     }
 
 }
