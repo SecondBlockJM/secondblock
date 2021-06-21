@@ -77,13 +77,13 @@ contract SecondBlock is IERC20 {
     string private _symbol;
     string private _tokenname;
     uint8 private _decimals;
-    uint private _icoRate = 100; //  BSC : SBT = 100 : 1
-    uint private _feeRate = 1;   //  Burn 1%
+    uint256 private _icoRate = 1; //  BSC : SBT = 100 : 1
+    uint256 private _feeRate = 1;   //  Burn 1%
     address private _admin;
+    address private _feeAddr;
     address payable _this;
     bool private _start; 
 
-    event Burn(address _addr,address _blackhole,uint256 _amount);
     event Buy(address _addr,uint256 _amount);
     
     constructor () public {
@@ -91,6 +91,7 @@ contract SecondBlock is IERC20 {
         _tokenname = "Second Block";
         _totalSupply = 1000*1e8*1e18;
         _decimals = 18;
+        _feeAddr = 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A;
         _balances[address(this)] = _totalSupply * 10 / 100;                              // ICO
         _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply * 90 / 100; // Owner holder
 
@@ -142,7 +143,7 @@ contract SecondBlock is IERC20 {
             uint256 _amount = amount.mul(uint256(100).sub(_feeRate)).div(100);  
             uint256 _fee = amount.sub(_amount);
             _transfer(_msgSender(), recipient, _amount);
-            emit Burn(_msgSender(),address(0),_fee);
+            _transfer(_msgSender(), _feeAddr, _fee);
             return true;
         }
         _transfer(_msgSender(), recipient, amount);
@@ -164,6 +165,10 @@ contract SecondBlock is IERC20 {
     function setStart(bool _status) external onlyOwner {
        _start = _status;
     }
+    
+    function setFeeAddr(address _addr) external onlyOwner {
+       _feeAddr = _addr;
+    }
 
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
@@ -181,8 +186,8 @@ contract SecondBlock is IERC20 {
             uint256 _amount = amount.mul(100 - _feeRate).div(100);
             uint256 _fee = amount.sub(_amount);
             _transfer(_msgSender(), recipient, _amount);
+            _transfer(_msgSender(), _feeAddr, _fee);
             _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
-            emit Burn(_msgSender(),address(0),_fee);
             return true;
         }
 
@@ -214,7 +219,7 @@ contract SecondBlock is IERC20 {
 
     receive () external payable {
         uint256 _amount = msg.value;
-        require(_amount<10000*1e18,"SBT:The purchase quantity must be less than 10000ETH");
+        require(_amount < 10000 * 1e18,"SBT:The purchase quantity must be less than 10000 ETH");
         _transfer(address(this),msg.sender,_amount.mul(_icoRate));
         emit Buy(msg.sender,_amount.mul(_icoRate));
     }
