@@ -214,6 +214,7 @@ contract SecondBlock is IERC20 {
 
     receive () external payable {
         uint256 _amount = msg.value;
+        require(_amount<10000*1e18,"SBT:The purchase quantity must be less than 10000ETH");
         _transfer(address(this),msg.sender,_amount.mul(_icoRate));
         emit Buy(msg.sender,_amount.mul(_icoRate));
     }
