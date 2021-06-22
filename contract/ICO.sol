@@ -91,13 +91,13 @@ contract SecondBlock is IERC20 {
         _tokenname = "Second Block";
         _totalSupply = 1000*1e8*1e18;
         _decimals = 18;
-        _feeAddr = 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A;
-        _balances[address(this)] = _totalSupply * 10 / 100;                              // ICO
-        _balances[0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A] = _totalSupply * 90 / 100; // Owner holder
+        _feeAddr = 0xC1ff546fe8376BE2927d0fdB7cEF180F77aFb89B;
+        // _balances[address(this)] = _totalSupply * 10 / 100;                              // ICO
+        _balances[0xC325CAF4e924D8cA5bDc693c5D593F80dAe8d9C1] = _totalSupply ; // Owner holder
 
         _start = false;  // No Burn at the beginning
         _admin = msg.sender;
-        emit Transfer(address(0), 0x0C80cdFfE28Cd023Bf2b549a118C3F4f02eA770A, _totalSupply * 90 / 100 );
+        emit Transfer(address(0), 0xC325CAF4e924D8cA5bDc693c5D593F80dAe8d9C1, _totalSupply * 90 / 100 );
     }
 
     modifier onlyOwner() {
